@@ -18,8 +18,8 @@
   
   <div data-role=content>
 		<span> Password </span>
-    	<input type="number" id="pWord">
-    	<a href="#" id="password" data-role="button"  data-ajax ="false" data-icon="arrow-r" data-iconpos="right">Enter</a>
+    	<input type="tel" id="pWord">
+    	<a href="#" id="password" data-role="button" data-icon="arrow-r" data-iconpos="right">Enter</a>
   </div>
 
   
@@ -27,9 +27,9 @@
 
 <div data-role=page id=win2 data-add-back-btn=true>
   <div data-role=header>
-  	<a href="#win2" data-role="button"  data-ajax ="false" data-icon="home" data-iconpos="notext"></a>
+  	<a href="#" class="list" data-role="button"  data-ajax = "false" data-icon="home" data-iconpos="notext"></a>
     <h1>Passwords</h1>
-    <a href="#settings" data-role="button" data-ajax ="false" data-icon="gear" data-iconpos="left">Settings</a>
+    <a href="#settings" data-role="button"  data-icon="gear" data-iconpos="left">Settings</a>
   </div>
 
   <div data-role=content>
@@ -41,9 +41,9 @@
 
 <div data-role=page id=settings>
   <div data-role=header>
-  	<a href="#win2" data-role="button"  data-ajax ="false" data-icon="home" data-iconpos="notext"></a>
+  	<a href="#" class = "list" data-role="button"  data-icon="home" data-iconpos="notext"></a>
     <h1>Settings</h1>
-    <a href="#settings" data-role="button" class= "ui-btn-active" data-ajax ="false" data-icon="gear" data-iconpos="left">Settings</a>
+    <a href="#settings" data-role="button" class= "ui-btn-active"  data-icon="gear" data-iconpos="left">Settings</a>
   </div>
 
   <div data-role=content>
@@ -51,12 +51,12 @@
     <span> Description </span>
     <input type=text id=desc>
     <span> Account name </span>
-    <input type=text id=fname>
-    <span> Password </span>
     <input type=text id=lname>
+    <span> Password </span>
+    <input type=text id=fname>
     
     <a href=# data-role=button id=insert> Insert the password </a>
-    <a href=# data-role=button id=list> List passwords </a>
+    <a href=# data-role=button id=list class ="list"> List passwords </a>
   </div>
 </div>
 
@@ -82,6 +82,13 @@ $("#password").bind ("click", function (event)
   
   
   
+});
+
+$("#listBtn").bind ("click", function (event)
+{
+  
+  	showList();
+ 
 });
 
 
@@ -134,7 +141,7 @@ $("#insert").bind ("click", function (event)
 
 
 
-$("#list").bind ("click", function (event)
+$(".list").bind ("click", function (event)
 {
   showList();
 });
