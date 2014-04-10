@@ -12,27 +12,51 @@
 <body> 
 <div data-role=page id=home>
   <div data-role=header>
+  	
     <h1>Home</h1>
   </div>
-
+  
   <div data-role=content>
-    <a href=# data-role=button id=create> Create customers table </a>
-    <a href=# data-role=button id=remove> Delete customers table </a>
-    <span> Last name </span>
-    <input type=text id=lname>
-    <span> First name </span>
-    <input type=text id=fname>
-    <a href=# data-role=button id=insert> Insert the customer </a>
-    <a href=# data-role=button id=list> List customers </a>
+		<span> Password </span>
+    	<input type="number" id="pWord">
+    	<a href="#" id="password" data-role="button"  data-ajax ="false" data-icon="arrow-r" data-iconpos="right">Enter</a>
   </div>
+
+  
 </div>
 
 <div data-role=page id=win2 data-add-back-btn=true>
   <div data-role=header>
-    <h1>List of customers</h1>
+  	<a href="#win2" data-role="button"  data-ajax ="false" data-icon="home" data-iconpos="notext"></a>
+    <h1>Passwords</h1>
+    <a href="#settings" data-role="button" data-ajax ="false" data-icon="gear" data-iconpos="left">Settings</a>
   </div>
 
   <div data-role=content>
+  		<div data-role=collapsibleset>
+  			
+  		</div>
+  </div>
+</div>
+
+<div data-role=page id=settings>
+  <div data-role=header>
+  	<a href="#win2" data-role="button"  data-ajax ="false" data-icon="home" data-iconpos="notext"></a>
+    <h1>Settings</h1>
+    <a href="#settings" data-role="button" class= "ui-btn-active" data-ajax ="false" data-icon="gear" data-iconpos="left">Settings</a>
+  </div>
+
+  <div data-role=content>
+    <a href=# data-role=button id=create> Create passwords table </a>
+    <span> Description </span>
+    <input type=text id=desc>
+    <span> Account name </span>
+    <input type=text id=fname>
+    <span> Password </span>
+    <input type=text id=lname>
+    
+    <a href=# data-role=button id=insert> Insert the password </a>
+    <a href=# data-role=button id=list> List passwords </a>
   </div>
 </div>
 
@@ -44,14 +68,34 @@
 var db = openDatabase ("Test", "1.0", "Test", 65535);
 
 
+$("#password").bind ("click", function (event)
+{
+  var pWord = $("#pWord").val ();
+  var realPass = "3685";
+  if(pWord === realPass){
+  	//$.mobile.changePage ($("#win2"));
+  	showList();
+  }
+  else{
+  	alert ("Password incorrect");
+  }
+  
+  
+  
+});
+
+
+
+
 $("#create").bind ("click", function (event)
 {
   db.transaction (function (transaction) 
   {
     var sql = "CREATE TABLE customers " +
         " (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+        "desc VARCHAR(100) NOT NULL, " +
         "lname VARCHAR(100) NOT NULL, " + 
-        "fname VARCHAR(100) NOT NULL)"
+        "fname VARCHAR(100) NOT NULL)" 
     transaction.executeSql (sql, undefined, function ()
     { 
       alert ("Table created");
@@ -70,30 +114,69 @@ $("#remove").bind ("click", function (event)
   });
 });
 
+
+
 $("#insert").bind ("click", function (event)
 {
   var lname = $("#lname").val ();
   var fname = $("#fname").val ();
+  var desc = $("#desc").val ();
   
   db.transaction (function (transaction) 
   {
-    var sql = "INSERT INTO customers (lname, fname) VALUES (?, ?)";
-    transaction.executeSql (sql, [lname, fname], function ()
+    var sql = "INSERT INTO customers (desc, fname, lname) VALUES (?, ?, ?)";
+    transaction.executeSql (sql, [desc, fname, lname], function ()
     { 
-      alert ("Customer inserted");
+      alert ("Password inserted");
     }, error);
   });
 });
 
+
+
 $("#list").bind ("click", function (event)
 {
+  showList();
+});
+
+
+$("#remove").bind ("click", function (event)
+{
+  if (!confirm ("Delete table?", "")) return;;
   db.transaction (function (transaction) 
+  {
+    var sql = "DROP TABLE customers";
+    transaction.executeSql (sql, undefined, ok, error);
+  });
+});
+
+function ok ()
+{
+}
+
+
+
+
+function error (transaction, err) 
+{
+  alert ("DB error : " + err.message);
+  return false;
+}
+
+
+
+//CODE I ADDED////////////////////////////////////////////////////////////////////////////////////////
+
+function showList (){
+	db.transaction (function (transaction) 
   {
     var sql = "SELECT * FROM customers";
     transaction.executeSql (sql, undefined, 
     function (transaction, result)
     {
-      var html = "<ul>";
+      //var html = "<ul>";
+      //var html = "<div data-role=collapsibleset>";
+      var html="";
       if (result.rows.length)
       {
         for (var i = 0; i < result.rows.length; i++) 
@@ -101,27 +184,43 @@ $("#list").bind ("click", function (event)
           var row = result.rows.item (i);
           var lname = row.lname;
           var fname = row.fname;
+          var desc = row.desc;
           var id = row.id;
-          html += "<li data-icon=false " + "id=" + id + ">";
+          html+= "<div data-role=collapsible>";
+          html+= "<h3>" + desc + "</h3>";
+          html += "<ul> <li data-icon=false " + "id=" + id + ">";
           html +=   "<a href=#>";
-          html +=      lname + "&nbsp;" + fname; 
+          html +=     "Account name: " + lname + "&nbsp;" + "<h4>Password: " + fname + "</h4>"; 
           html +=   "</a>"; 
-          html += "</li>";
+          html += "</li> </ul>";
+          //html+= "<p> " + lname + "&nbsp;" + fname + "</p>";
+          html+= "</div>";
+          //html += "<li data-icon=false " + "id=" + id + ">";
+          //html +=   "<a href=#>";
+          //html +=     desc + "&nbsp;" + lname + "&nbsp;" + fname; 
+         // html +=   "</a>"; 
+          //html += "</li>";
         }
       }
       else
       {
-        html += "<li> No customer </li>";
+        html += "<p> No customer </p>";
       }
       
-      html += "</ul>";
+      //html += "</ul>";
+      //html+= "</div>";
       
       $("#win2").unbind ().bind ("pagebeforeshow", function ()
       {
-        var $content = $("#win2 div:jqmData(role=content)");
+        var $content = $("#win2 div:jqmData(role=collapsibleset)");
         $content.html (html);
         var $ul = $content.find ("ul");
         $ul.listview ();
+        var $coll = $content.find("div");
+        $coll.collapsible();
+        
+        
+        
         
         $("li").bind ("swiperight", function (event)
         {
@@ -149,97 +248,6 @@ $("#list").bind ("click", function (event)
       
     }, error);
   });
-});
-
-$("#remove").bind ("click", function (event)
-{
-  if (!confirm ("Delete table?", "")) return;;
-  db.transaction (function (transaction) 
-  {
-    var sql = "DROP TABLE customers";
-    transaction.executeSql (sql, undefined, ok, error);
-  });
-});
-
-function ok ()
-{
-}
-
-function error (transaction, err) 
-{
-  alert ("DB error : " + err.message);
-  return false;
-}
-
-$("#list").bind ("click", function (event)
-{
-  db.transaction (function (transaction) 
-  {
-    var sql = "SELECT * FROM customers";
-    transaction.executeSql (sql, undefined, 
-    function (transaction, result)
-    {
-      var html = "<ul>";
-      if (result.rows.length)
-      {
-        for (var i = 0; i < result.rows.length; i++) 
-        {
-          var row = result.rows.item (i);
-          var lname = row.lname;
-          var fname = row.fname;
-          var id = row.id;
-          html += "<li data-icon=false " + "id=" + id + ">";
-          html +=   "<a href=#>";
-          html +=      lname + "&nbsp;" + fname; 
-          html +=   "</a>"; 
-          html += "</li>";
-        }
-      }
-      else
-      {
-        html += "<li> No customer </li>";
-      }
-      
-      html += "</ul>";
-      
-      $("#win2").unbind ().bind ("pagebeforeshow", function ()
-      {
-        var $content = $("#win2 div:jqmData(role=content)");
-        $content.html (html);
-        var $ul = $content.find ("ul");
-        $ul.listview ();
-        
-        $("li").bind ("swiperight", function (event)
-        {
-          var id = $(this).attr ("id");
-          if (!id) return;
-          
-          $(this).remove ();
-          
-          db.transaction (function (transaction) 
-          {
-            var sql = "DELETE FROM customers WHERE id=?";
-            transaction.executeSql (sql, [id], function ()
-            { 
-              alert ("Customer deleted");
-            }, error);
-          });
-        });        
-      });
-      
-      $.mobile.changePage ($("#win2"));
-      
-    }, error);
-  });
-});
-function ok ()
-{
-}
-
-function error (transaction, err) 
-{
-  alert ("DB error : " + err.message);
-  return false;
 }
 
 </script>
