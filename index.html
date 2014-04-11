@@ -27,9 +27,9 @@
 
 <div data-role=page id=win2 data-add-back-btn=true>
   <div data-role=header>
-  	<a href="#" class="list" data-role="button"  data-ajax = "false" data-icon="home" data-iconpos="notext"></a>
+  	<a href="#"  data-role="button" class= "ui-btn-active" class="list" data-icon="home" data-iconpos="notext"></a>
     <h1>Passwords</h1>
-    <a href="#settings" data-role="button"  data-icon="gear" data-iconpos="left">Settings</a>
+    <a href="#settings" data-role="button" data-icon="gear" data-iconpos="left">Settings</a>
   </div>
 
   <div data-role=content>
@@ -48,6 +48,7 @@
 
   <div data-role=content>
     <a href=# data-role=button id=create> Create passwords table </a>
+    <a href=# data-role=button id=remove> Delete passwords table </a>
     <span> Description </span>
     <input type=text id=desc>
     <span> Account name </span>
@@ -66,6 +67,24 @@
 <script>
 
 var db = openDatabase ("Test", "1.0", "Test", 65535);
+
+$("#home").on("pageinit",function(){
+ 	
+  db.transaction (function (transaction) 
+  {
+    var sql = "CREATE TABLE customers " +
+        " (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+        "desc VARCHAR(100) NOT NULL, " +
+        "lname VARCHAR(100) NOT NULL, " + 
+        "fname VARCHAR(100) NOT NULL)" 
+    transaction.executeSql (sql, undefined, function ()
+    { 
+      alert ("Table created");
+    });
+  });
+ 
+ 
+});
 
 
 $("#password").bind ("click", function (event)
@@ -110,7 +129,7 @@ $("#create").bind ("click", function (event)
   });
 });
 
-
+////////this is one entry
 $("#remove").bind ("click", function (event)
 {
   if (!confirm ("Delete table?", "")) return;;
@@ -137,6 +156,10 @@ $("#insert").bind ("click", function (event)
       alert ("Password inserted");
     }, error);
   });
+  
+  document.getElementById('lname').value='';
+  document.getElementById('desc').value='';
+  document.getElementById('fname').value='';
 });
 
 
@@ -147,15 +170,6 @@ $(".list").bind ("click", function (event)
 });
 
 
-$("#remove").bind ("click", function (event)
-{
-  if (!confirm ("Delete table?", "")) return;;
-  db.transaction (function (transaction) 
-  {
-    var sql = "DROP TABLE customers";
-    transaction.executeSql (sql, undefined, ok, error);
-  });
-});
 
 function ok ()
 {
@@ -245,15 +259,20 @@ function showList (){
 	            
 	            { 
 	              alert ("Customer deleted");
+	              $.mobile.changePage ($("#settings"));
+	              
+	              
 	            }, error);
 	         
           });
         });        
       });
       
+      //$.mobile.changePage ($("#settings"));
       $.mobile.changePage ($("#win2"));
       
     }, error);
+    
   });
 }
 
